@@ -22,7 +22,8 @@ class Human : public Entity
 {
 private:
 	string strName;
-private:
+public:
+	Human() : Entity() {};
 	Human(string strNewName) { strName = strNewName; };
 
 	string getName();

@@ -1,19 +1,23 @@
 #pragma once
 #include "Utility.h"
+#include "Entity.h"
 #include <string>
+#include <vector>
 
 using namespace std;
 
 class Game
 {
 private:
-	string strName;
 	string strDifficulty;
-	int intBoardSize;
+	int intBoardSize = 30;
+	Human player;
+	vector<Zombie> zombies;
+
+	void createHuman();
+	void getDifficulty();
+	void createZombies();
 public:
 	Game() {};
 	bool run();
-
-	void configWindow();
-	void getGameDetails();
 };

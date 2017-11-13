@@ -9,7 +9,7 @@ using namespace std;
 
 class Utility
 {
-	//purpose: provides program-wide utilities for common functions
+	//purpose: provides program-wide methods for common functions
 
 private:
 	Utility() {}; //private to prevent class from being constructed

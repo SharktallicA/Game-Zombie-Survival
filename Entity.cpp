@@ -16,3 +16,8 @@ void Entity::setY(int intNewY)
 {
 	intY = intNewY;
 }
+
+string Human::getName()
+{
+	return strName;
+}
