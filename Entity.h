@@ -1,21 +1,20 @@
 #pragma once
 #include "Utility.h"
 #include <string>
+#include <conio.h>
 
 using namespace std;
 
 class Entity
 {
-private:
+protected:
 	int intX;
 	int intY;
 public:
 	Entity() {};
-
 	int getX();
 	int getY();
-	void setX(int);
-	void setY(int);
+	virtual void move() {};
 };
 
 class Human : public Entity
@@ -24,12 +23,15 @@ private:
 	string strName;
 public:
 	Human() : Entity() {};
-	Human(string strNewName) { strName = strNewName; };
-
+	Human(string, int, int);
 	string getName();
+	void move();
 };
 
 class Zombie : public Entity
 {
-
+public:
+	Zombie() : Entity() {};
+	Zombie(int, int);
+	void move();
 };

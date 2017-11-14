@@ -7,7 +7,7 @@ bool Game::run()
 
 	//set up window
 	Utility::setWindowTitle("Zombie Survival");
-	Utility::setWindowSize(800, 600);
+	Utility::setWindowSize(800, 800);
 
 	//set up game
 	createHuman();
@@ -15,9 +15,10 @@ bool Game::run()
 	createZombies();
 
 	//run game loop
+	bool boolHumanAlive = true, boolZombiesAlive = true;
 	printHeader();
 	printBoard();
-	while (true)
+	while (boolHumanAlive && boolZombiesAlive)
 		update();
 
 	//end game
@@ -27,13 +28,7 @@ bool Game::run()
 void Game::createHuman()
 {
 	//purpose: configure's the human's start properties
-
-	//set player name
-	player = Human(Utility::getString("Enter your name: "));
-
-	//randomise player start location
-	player.setX(Utility::generateNumber(0, 29));
-	player.setY(Utility::generateNumber(0, 29));
+	player = Human(Utility::getString("Enter your name: "), Utility::generateNumber(1, intBOARDX), Utility::generateNumber(1, intBOARDY));
 }
 void Game::getDifficulty()
 {
@@ -54,7 +49,6 @@ void Game::createZombies()
 
 	for (int i = 0; i < intToMake; i++)
 	{
-		Zombie newZombie;
 		bool boolIsUnique = false;
 		int intX, intY;
 
@@ -62,8 +56,8 @@ void Game::createZombies()
 		{
 			//generate two start numbers
 			boolIsUnique = true;
-			intX = Utility::generateNumber(0, 29);
-			intY = Utility::generateNumber(0, 29);
+			intX = Utility::generateNumber(1, intBOARDX);
+			intY = Utility::generateNumber(1, intBOARDY);
 
 			//prevent zombie from spawning on other zombies
 			if (!zombies.empty())
@@ -86,21 +80,49 @@ void Game::createZombies()
 			}
 		}
 
-		newZombie.setX(intX);
-		newZombie.setY(intY);
-		zombies.push_back(newZombie);
+		zombies.push_back(Zombie(intX, intY));
 	}
 }
 
 void Game::printHeader()
 {
+	//purpose: prints header of program
+
 	Utility::clearScreen();
 	cout << "Zombie Survival | Khalid Ali";
-
 }
 void Game::printBoard()
 {
+	//purpose: prints out board with all entity starting positions in place
 
+	//draw board rows
+	for (int intIndex = 0; intIndex <= intBOARDX; intIndex++)
+	{
+		Utility::moveCursor(4 + intIndex, 3);
+		cout << charBORDER;
+		Utility::moveCursor(4 + intIndex, 4 + intBOARDY);
+		cout << charBORDER;
+	}
+	
+	//draw board columns
+	for (int intIndex = 0; intIndex <= intBOARDY + 1; intIndex++)
+	{
+		Utility::moveCursor(4, 3 + intIndex);
+		cout << charBORDER;
+		Utility::moveCursor(5 + intBOARDX, 3 + intIndex);
+		cout << charBORDER;
+	}
+
+	//draw human
+	Utility::moveCursor(4 + player.getX(), 3 + player.getY());
+	cout << charHUMAN;
+
+	//draw zombies
+	for (auto zombie : zombies)
+	{
+		Utility::moveCursor(4 + zombie.getX(), 3 + zombie.getY());
+		cout << charZOMBIE;
+	}
 }
 
 void Game::update()
