@@ -17,6 +17,11 @@ private:
 	void createHuman();
 	void getDifficulty();
 	void createZombies();
+
+	void printHeader();
+	void printBoard();
+
+	void update();
 public:
 	Game() {};
 	bool run();

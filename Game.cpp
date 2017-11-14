@@ -14,6 +14,12 @@ bool Game::run()
 	getDifficulty();
 	createZombies();
 
+	//run game loop
+	printHeader();
+	printBoard();
+	while (true)
+		update();
+
 	//end game
 	return Utility::getYesNo("Play again (y/n)? ");
 }
@@ -84,4 +90,20 @@ void Game::createZombies()
 		newZombie.setY(intY);
 		zombies.push_back(newZombie);
 	}
+}
+
+void Game::printHeader()
+{
+	Utility::clearScreen();
+	cout << "Zombie Survival | Khalid Ali";
+
+}
+void Game::printBoard()
+{
+
+}
+
+void Game::update()
+{
+
 }

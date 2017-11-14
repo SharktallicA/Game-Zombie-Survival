@@ -113,7 +113,7 @@ int Utility::generateNumber(int intMin, int intMax)
 void Utility::clearScreen(void)
 {
 	//purpose: clears the screen
-	cout << string(50, '\n');
+	system("cls");
 }
 void Utility::setWindowTitle(string strTitle)
 {
