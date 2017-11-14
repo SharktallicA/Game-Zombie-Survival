@@ -26,4 +26,5 @@ public:
 	static void clearScreen();
 	static void setWindowTitle(string);
 	static void setWindowSize(unsigned int, unsigned int);
+	static void moveCursor(unsigned int, unsigned int);
 };

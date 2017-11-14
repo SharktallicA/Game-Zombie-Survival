@@ -132,3 +132,12 @@ void Utility::setWindowSize(unsigned int uintWidth, unsigned int uintHeight)
 	GetWindowRect(console, &rectWindow);
 	MoveWindow(console, rectWindow.left, rectWindow.top, uintWidth, uintHeight, TRUE);
 }
+void Utility::moveCursor(unsigned int uintX, unsigned int uintY)
+{
+	//purpose: moves cursor 
+	//parametres: (uintWidth) specified cursor X, (uintHeight) specified cursor Y
+
+	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD point = { uintX, uintY };
+	SetConsoleCursorPosition(handle, point);
+}
