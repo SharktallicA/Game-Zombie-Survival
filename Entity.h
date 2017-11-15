@@ -17,6 +17,14 @@ public:
 	virtual void move() {};
 };
 
+class Zombie : public Entity
+{
+public:
+	Zombie() : Entity() {};
+	Zombie(int, int);
+	void move();
+};
+
 class Human : public Entity
 {
 private:
@@ -25,13 +33,5 @@ public:
 	Human() : Entity() {};
 	Human(string, int, int);
 	string getName();
-	void move();
-};
-
-class Zombie : public Entity
-{
-public:
-	Zombie() : Entity() {};
-	Zombie(int, int);
-	void move();
+	void move(const COORD, const vector<Zombie>);
 };

@@ -28,7 +28,7 @@ bool Game::run()
 void Game::createHuman()
 {
 	//purpose: configure's the human's start properties
-	player = Human(Utility::getString("Enter your name: "), Utility::generateNumber(1, intBOARDX), Utility::generateNumber(1, intBOARDY));
+	player = Human(Utility::getString("Enter your name: "), Utility::generateNumber(1, board.X), Utility::generateNumber(1, board.Y));
 }
 void Game::getDifficulty()
 {
@@ -56,8 +56,8 @@ void Game::createZombies()
 		{
 			//generate two start numbers
 			boolIsUnique = true;
-			intX = Utility::generateNumber(1, intBOARDX);
-			intY = Utility::generateNumber(1, intBOARDY);
+			intX = Utility::generateNumber(1, board.X);
+			intY = Utility::generateNumber(1, board.Y);
 
 			//prevent zombie from spawning on other zombies
 			if (!zombies.empty())
@@ -96,20 +96,20 @@ void Game::printBoard()
 	//purpose: prints out board with all entity starting positions in place
 
 	//draw board rows
-	for (int intIndex = 0; intIndex <= intBOARDX; intIndex++)
+	for (int intIndex = 0; intIndex <= board.X; intIndex++)
 	{
 		Utility::moveCursor(4 + intIndex, 3);
 		cout << charBORDER;
-		Utility::moveCursor(4 + intIndex, 4 + intBOARDY);
+		Utility::moveCursor(4 + intIndex, 4 + board.Y);
 		cout << charBORDER;
 	}
 	
 	//draw board columns
-	for (int intIndex = 0; intIndex <= intBOARDY + 1; intIndex++)
+	for (int intIndex = 0; intIndex <= board.Y + 1; intIndex++)
 	{
 		Utility::moveCursor(4, 3 + intIndex);
 		cout << charBORDER;
-		Utility::moveCursor(5 + intBOARDX, 3 + intIndex);
+		Utility::moveCursor(5 + board.X, 3 + intIndex);
 		cout << charBORDER;
 	}
 
@@ -127,5 +127,20 @@ void Game::printBoard()
 
 void Game::update()
 {
+	//get player's last position before move
+	COORD playerLast; 
+	playerLast.X = player.getX();
+	playerLast.Y = player.getX();
+	player.move(board, zombies);
 
+	//get all zombie last positions before move
+	vector<COORD> zombiesLast;
+	for (auto zombie : zombies)
+	{
+		COORD zombieLast;
+		zombieLast.X = zombie.getX();
+		zombieLast.Y = zombie.getY();
+		zombiesLast.push_back(zombieLast);
+		zombie.move();
+	}
 }

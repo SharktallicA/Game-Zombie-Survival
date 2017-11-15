@@ -19,7 +19,7 @@ string Human::getName()
 {
 	return strName;
 }
-void Human::move()
+void Human::move(const COORD coordBoard, const vector<Zombie> zombies)
 {
 	char charInput = 0; //variable for input character
 	bool boolMoveLegal = false; //flag to indicate if move is valid
