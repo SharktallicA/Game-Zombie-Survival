@@ -1,5 +1,6 @@
 #pragma once
 #include "Utility.h"
+#include "coord.h"
 #include <string>
 #include <conio.h>
 
@@ -33,5 +34,5 @@ public:
 	Human() : Entity() {};
 	Human(string, int, int);
 	string getName();
-	void move(const COORD, const vector<Zombie>);
+	void move(const coord, const vector<Zombie>);
 };

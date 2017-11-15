@@ -1,6 +1,7 @@
 #pragma once
 #include "Utility.h"
 #include "Entity.h"
+#include "coord.h"
 #include <string>
 #include <vector>
 
@@ -15,7 +16,7 @@ private:
 	const unsigned char charZOMBIE = 'Z';
 
 	//game variables
-	COORD board;
+	coord board;
 	string strDifficulty;
 
 	//game objects
