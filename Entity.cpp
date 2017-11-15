@@ -21,28 +21,38 @@ string Human::getName()
 }
 void Human::move(const coord coordBoard, const vector<Zombie> zombies)
 {
-	char charInput = 0; //variable for input character
-	bool boolMoveLegal = false; //flag to indicate if move is valid
+	char charInput = '0';
 
-	while (!boolMoveLegal) //iterate until valid move
+	while (!checkMove(coordBoard, charInput))
+		charInput = Utility::getCharacter();
+	
+	switch (charInput)
 	{
-		charInput = _getch(); //gets character (method will need to be replaced with something that is not from the MS-DOS days...)
-		switch (charInput)
-		{
-		case 'W':
-		case 'w':
-			break;
-		case 'A':
-		case 'a':
-			break;
-		case 's':
-		case 'S':
-			break;
-		case 'D':
-		case 'd':
-			break;
-		}
+	case 'W':
+	case 'w':
+		intY--;
+		break;
+	case 'A':
+	case 'a':
+		intX--;
+		break;
+	case 'S':
+	case 's':
+		intY++;
+		break;
+	case 'D':
+	case 'd':
+		intX++;
+		break;
 	}
+}
+bool Human::checkMove(const coord coordBoard, const char charValue)
+{
+	if ((charValue == 'W' || charValue == 'w') && intY > 1) return true;
+	else if ((charValue == 'S' || charValue == 's') && intY < coordBoard.Y) return true;
+	else if ((charValue == 'A' || charValue == 'a') && intX > 1) return true;
+	else if ((charValue == 'D' || charValue == 'd') && intX < coordBoard.X) return true;
+	else return false;
 }
 
 Zombie::Zombie(int intNewX, int intNewY)
@@ -50,7 +60,16 @@ Zombie::Zombie(int intNewX, int intNewY)
 	intX = intNewX;
 	intY = intNewY;
 };
-void Zombie::move()
+void Zombie::move(const coord coordBoard)
 {
+	int intInput = Utility::generateNumber(1, 4);
 
+	if (intInput == 1)
+		intX++;
+	else if (intInput == 2)
+		intX--;
+	else if (intInput == 3)
+		intY++;
+	else if (intInput == 4)
+		intY--;
 }

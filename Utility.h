@@ -4,6 +4,7 @@
 #include <sstream>
 #include <random>
 #include <windows.h>
+#include <conio.h>
 
 using namespace std;
 
@@ -19,6 +20,8 @@ public:
 	static bool getYesNo(string);
 	static string getString();
 	static string getString(string);
+	static char getCharacter();
+	static char getCharacter(string);
 	static int getInteger();
 	static int getInteger(string, int, int);
 

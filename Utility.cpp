@@ -61,6 +61,22 @@ string Utility::getString(string strMessage)
 	getline(cin, strInput);
 	return strInput;
 }
+char Utility::getCharacter()
+{
+	//purpose: gets any character value safely (requires a notice for entry beforehand)
+
+	char charInput =_getch();
+	return charInput;
+} 
+char Utility::getCharacter(string strMessage)
+{
+	//purpose: gets any character value safely (is given notice of entry)
+	//parameters: (strMessage) required notice of entry
+
+	cout << strMessage;
+	char charInput = _getch();
+	return charInput;
+}
 int Utility::getInteger(void)
 {
 	//purpose: gets any integer value safely (requires a notice for entry beforehand)

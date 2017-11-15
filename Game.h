@@ -1,7 +1,7 @@
 #pragma once
-#include "Utility.h"
-#include "Entity.h"
 #include "coord.h"
+#include "Entity.h"
+#include "Utility.h"
 #include <string>
 #include <vector>
 

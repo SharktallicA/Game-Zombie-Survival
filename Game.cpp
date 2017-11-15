@@ -52,35 +52,35 @@ void Game::createZombies()
 		bool boolIsUnique = false;
 		int intX, intY;
 
-		while (!boolIsUnique) //iterate until X-Y are unique
+while (!boolIsUnique) //iterate until X-Y are unique
+{
+	//generate two start numbers
+	boolIsUnique = true;
+	intX = Utility::generateNumber(1, board.X);
+	intY = Utility::generateNumber(1, board.Y);
+
+	//prevent zombie from spawning on other zombies
+	if (!zombies.empty())
+	{
+		for (auto zombie : zombies)
 		{
-			//generate two start numbers
-			boolIsUnique = true;
-			intX = Utility::generateNumber(1, board.X);
-			intY = Utility::generateNumber(1, board.Y);
-
-			//prevent zombie from spawning on other zombies
-			if (!zombies.empty())
-			{
-				for (auto zombie : zombies)
-				{
-					if (boolIsUnique)
-					{
-						if (intX == zombie.getX() && intY == zombie.getY())
-							boolIsUnique = false;
-					}
-				}
-			}
-
-			//prevent zombie from being spanwed on player
 			if (boolIsUnique)
 			{
-				if (intX == player.getX() && intY == player.getY())
+				if (intX == zombie.getX() && intY == zombie.getY())
 					boolIsUnique = false;
 			}
 		}
+	}
 
-		zombies.push_back(Zombie(intX, intY));
+	//prevent zombie from being spanwed on player
+	if (boolIsUnique)
+	{
+		if (intX == player.getX() && intY == player.getY())
+			boolIsUnique = false;
+	}
+}
+
+zombies.push_back(Zombie(intX, intY));
 	}
 }
 
@@ -103,7 +103,7 @@ void Game::printBoard()
 		Utility::moveCursor(4 + intIndex, 4 + board.Y);
 		cout << charBORDER;
 	}
-	
+
 	//draw board columns
 	for (int intIndex = 0; intIndex <= board.Y + 1; intIndex++)
 	{
@@ -127,13 +127,19 @@ void Game::printBoard()
 
 void Game::update()
 {
-	//get player's last position before move
-	COORD playerLast; 
+	//move human
+	COORD playerLast;
 	playerLast.X = player.getX();
-	playerLast.Y = player.getX();
+	playerLast.Y = player.getY();
 	player.move(board, zombies);
 
-	//get all zombie last positions before move
+	//redraw human
+	Utility::moveCursor(4 + playerLast.X, 3 + playerLast.Y);
+	cout << " ";
+	Utility::moveCursor(4 + player.getX(), 3 + player.getY());
+	cout << charHUMAN;
+
+	//move zombies
 	vector<COORD> zombiesLast;
 	for (auto zombie : zombies)
 	{
@@ -141,6 +147,16 @@ void Game::update()
 		zombieLast.X = zombie.getX();
 		zombieLast.Y = zombie.getY();
 		zombiesLast.push_back(zombieLast);
-		zombie.move();
+	}
+	for (auto zombie : zombies)
+		zombie.move(board);
+
+	//redraw zombies
+	for (int intIndex = 0; intIndex < zombies.size(); intIndex++)
+	{
+		Utility::moveCursor(4 + zombiesLast[intIndex].X, 3 + zombiesLast[intIndex].Y);
+		cout << " ";
+		Utility::moveCursor(4 + zombies[intIndex].getX(), 3 + zombies[intIndex].getY());
+		cout << charZOMBIE;
 	}
 }

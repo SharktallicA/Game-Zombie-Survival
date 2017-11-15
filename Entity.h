@@ -1,6 +1,6 @@
 #pragma once
-#include "Utility.h"
 #include "coord.h"
+#include "Utility.h"
 #include <string>
 #include <conio.h>
 
@@ -20,16 +20,18 @@ public:
 
 class Zombie : public Entity
 {
+private:
 public:
 	Zombie() : Entity() {};
 	Zombie(int, int);
-	void move();
+	void move(const coord);
 };
 
 class Human : public Entity
 {
 private:
 	string strName;
+	bool checkMove(const coord, const char);
 public:
 	Human() : Entity() {};
 	Human(string, int, int);
