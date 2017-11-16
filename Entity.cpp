@@ -62,7 +62,12 @@ Zombie::Zombie(int intNewX, int intNewY)
 };
 void Zombie::move(const coord coordBoard)
 {
-	int intInput = Utility::generateNumber(1, 4);
+	if (intDecay == 0)
+		intDecay = Utility::generateNumber(1, 5);
+	else
+	{
+		intDecay--;
+	}
 
 	if (intInput == 1)
 		intX++;

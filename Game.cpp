@@ -43,7 +43,7 @@ void Game::createZombies()
 {
 	//purpose: generates a bunch of zombies (based on difficulty) and randomises their location
 
-	int intToMake = 10;
+	int intToMake = 1;
 	if (strDifficulty == "pro")
 		intToMake *= 2;
 
@@ -127,29 +127,28 @@ void Game::printBoard()
 
 void Game::update()
 {
-	//move human
+	//update human position
 	COORD playerLast;
 	playerLast.X = player.getX();
 	playerLast.Y = player.getY();
 	player.move(board, zombies);
+
+	//update zombie positions
+	vector<COORD> zombiesLast;
+	for (int intIndex = 0; intIndex < zombies.size(); intIndex++)
+	{
+		COORD zombieLast;
+		zombieLast.X = zombies[intIndex].getX();
+		zombieLast.Y = zombies[intIndex].getY();
+		zombiesLast.push_back(zombieLast);
+		zombies[intIndex].move(board);
+	}
 
 	//redraw human
 	Utility::moveCursor(4 + playerLast.X, 3 + playerLast.Y);
 	cout << " ";
 	Utility::moveCursor(4 + player.getX(), 3 + player.getY());
 	cout << charHUMAN;
-
-	//move zombies
-	vector<COORD> zombiesLast;
-	for (auto zombie : zombies)
-	{
-		COORD zombieLast;
-		zombieLast.X = zombie.getX();
-		zombieLast.Y = zombie.getY();
-		zombiesLast.push_back(zombieLast);
-	}
-	for (auto zombie : zombies)
-		zombie.move(board);
 
 	//redraw zombies
 	for (int intIndex = 0; intIndex < zombies.size(); intIndex++)

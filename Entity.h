@@ -21,6 +21,8 @@ public:
 class Zombie : public Entity
 {
 private:
+	int intDecay = 0;
+	char charDirect
 public:
 	Zombie() : Entity() {};
 	Zombie(int, int);
