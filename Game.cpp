@@ -36,15 +36,15 @@ void Game::getDifficulty()
 
 	do
 	{
-		strDifficulty = Utility::getString("Enter difficulty (novice/pro): ");
+		strDifficulty = Utility::getString("Enter difficulty (novice/n or pro/p): ");
 	} while(strDifficulty != "novice" && strDifficulty != "pro");
 }
 void Game::createZombies()
 {
 	//purpose: generates a bunch of zombies (based on difficulty) and randomises their location
 
-	int intToMake = 1;
-	if (strDifficulty == "pro")
+	int intToMake = 10;
+	if (strDifficulty == "pro" || strDifficulty == "p")
 		intToMake *= 2;
 
 	for (int i = 0; i < intToMake; i++)
@@ -128,20 +128,20 @@ void Game::printBoard()
 void Game::update()
 {
 	//update human position
-	COORD playerLast;
+	coord playerLast;
 	playerLast.X = player.getX();
 	playerLast.Y = player.getY();
 	player.move(board, zombies);
 
 	//update zombie positions
-	vector<COORD> zombiesLast;
+	vector<coord> zombiesLast;
 	for (int intIndex = 0; intIndex < zombies.size(); intIndex++)
 	{
-		COORD zombieLast;
+		coord zombieLast;
 		zombieLast.X = zombies[intIndex].getX();
 		zombieLast.Y = zombies[intIndex].getY();
 		zombiesLast.push_back(zombieLast);
-		zombies[intIndex].move(board);
+		zombies[intIndex].move(board, zombies);
 	}
 
 	//redraw human
@@ -157,5 +157,16 @@ void Game::update()
 		cout << " ";
 		Utility::moveCursor(4 + zombies[intIndex].getX(), 3 + zombies[intIndex].getY());
 		cout << charZOMBIE;
+	}
+
+	Utility::moveCursor(0, 40); //moves cursor out of board when update has finished
+
+	for (int intIndexX = 0; intIndexX < zombies.size(); intIndexX++)
+	{
+		for (int intIndexY = 0; intIndexY < zombies.size(); intIndexY++)
+		{
+			if (zombies[intIndexX].getX() == zombies[intIndexY].getX() && zombies[intIndexX].getY() == zombies[intIndexY].getY())
+				cout << "COLLISION AT " << zombies[intIndexX].getX() << "x" << zombies[intIndexX].getY() << endl;
+		}
 	}
 }

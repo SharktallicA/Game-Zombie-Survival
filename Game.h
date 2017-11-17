@@ -2,6 +2,7 @@
 #include "coord.h"
 #include "Entity.h"
 #include "Utility.h"
+#include <iostream>
 #include <string>
 #include <vector>
 

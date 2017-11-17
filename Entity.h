@@ -1,8 +1,9 @@
 #pragma once
 #include "coord.h"
 #include "Utility.h"
-#include <string>
 #include <conio.h>
+#include <string>
+#include <typeinfo>
 
 using namespace std;
 
@@ -22,11 +23,13 @@ class Zombie : public Entity
 {
 private:
 	int intDecay = 0;
-	char charDirect
+	char charDirection = 0;
+	void changeDirection();
+	bool checkMove(const coord, const char, const vector<Zombie>);
 public:
 	Zombie() : Entity() {};
 	Zombie(int, int);
-	void move(const coord);
+	void move(const coord, const vector<Zombie>);
 };
 
 class Human : public Entity
