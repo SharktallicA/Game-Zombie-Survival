@@ -126,6 +126,7 @@ int Utility::generateNumber(int intMin, int intMax)
 	intResult = distInt(mersenne);
 	return intResult;
 }
+
 void Utility::clearScreen(void)
 {
 	//purpose: clears the screen
@@ -147,6 +148,16 @@ void Utility::setWindowSize(unsigned int uintWidth, unsigned int uintHeight)
 
 	GetWindowRect(console, &rectWindow);
 	MoveWindow(console, rectWindow.left, rectWindow.top, uintWidth, uintHeight, TRUE);
+}
+void Utility::setColour(COLOUR clrFore, COLOUR clrBack = BLACK)
+{
+	//purpose: sets the console colour
+	//parametres: (clrFore) enumeration for foreground colour, (clrBack) enumeration for background colour (defaulted as black)
+
+	int intColour = clrBack * 16 + clrFore;
+	HWND console = GetConsoleWindow();
+
+	SetConsoleTextAttribute(console, intColour);
 }
 void Utility::moveCursor(SHORT shrtX, SHORT shrtY)
 {
