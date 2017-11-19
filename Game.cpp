@@ -37,7 +37,7 @@ void Game::getDifficulty()
 	do
 	{
 		strDifficulty = Utility::getString("Enter difficulty (novice/n or pro/p): ");
-	} while(strDifficulty != "novice" && strDifficulty != "pro");
+	} while(strDifficulty != "novice" && strDifficulty != "n" && strDifficulty != "pro" && strDifficulty != "p");
 }
 void Game::createZombies()
 {
@@ -47,40 +47,40 @@ void Game::createZombies()
 	if (strDifficulty == "pro" || strDifficulty == "p")
 		intToMake *= 2;
 
-	for (int i = 0; i < intToMake; i++)
+	for (int intIndex = 0; intIndex < intToMake; intIndex++)
 	{
 		bool boolIsUnique = false;
 		int intX, intY;
 
-while (!boolIsUnique) //iterate until X-Y are unique
-{
-	//generate two start numbers
-	boolIsUnique = true;
-	intX = Utility::generateNumber(1, board.X);
-	intY = Utility::generateNumber(1, board.Y);
-
-	//prevent zombie from spawning on other zombies
-	if (!zombies.empty())
-	{
-		for (auto zombie : zombies)
+		while (!boolIsUnique) //iterate until X-Y are unique
 		{
+			//generate two start numbers
+			boolIsUnique = true;
+			intX = Utility::generateNumber(1, board.X);
+			intY = Utility::generateNumber(1, board.Y);
+
+			//prevent zombie from spawning on other zombies
+			if (!zombies.empty())
+			{
+				for (auto zombie : zombies)
+				{
+					if (boolIsUnique)
+					{
+					if (intX == zombie.getX() && intY == zombie.getY())
+						boolIsUnique = false;
+					}
+				}
+			}
+
+			//prevent zombie from being spanwed on player
 			if (boolIsUnique)
 			{
-				if (intX == zombie.getX() && intY == zombie.getY())
+				if (intX == player.getX() && intY == player.getY())
 					boolIsUnique = false;
 			}
 		}
-	}
 
-	//prevent zombie from being spanwed on player
-	if (boolIsUnique)
-	{
-		if (intX == player.getX() && intY == player.getY())
-			boolIsUnique = false;
-	}
-}
-
-zombies.push_back(Zombie(intX, intY));
+		zombies.push_back(Zombie(intIndex, intX, intY));
 	}
 }
 
@@ -123,10 +123,16 @@ void Game::printBoard()
 		Utility::moveCursor(4 + zombie.getX(), 3 + zombie.getY());
 		cout << charZOMBIE;
 	}
+
+	//draw event board
+	Utility::moveCursor(0, 37);
+	cout << "Events: ";
 }
 
 void Game::update()
 {
+	//purpose: moves game forward in every turn; handles movement and redrawing
+
 	//update human position
 	coord playerLast;
 	playerLast.X = player.getX();
@@ -153,20 +159,51 @@ void Game::update()
 	//redraw zombies
 	for (int intIndex = 0; intIndex < zombies.size(); intIndex++)
 	{
-		Utility::moveCursor(4 + zombiesLast[intIndex].X, 3 + zombiesLast[intIndex].Y);
-		cout << " ";
-		Utility::moveCursor(4 + zombies[intIndex].getX(), 3 + zombies[intIndex].getY());
-		cout << charZOMBIE;
+		if (zombies[intIndex].checkIfAlive())
+		{
+			Utility::moveCursor(4 + zombiesLast[intIndex].X, 3 + zombiesLast[intIndex].Y);
+			cout << " ";
+			Utility::moveCursor(4 + zombies[intIndex].getX(), 3 + zombies[intIndex].getY());
+			cout << charZOMBIE;
+		}
 	}
 
-	Utility::moveCursor(0, 40); //moves cursor out of board when update has finished
+	//post-update procedures
+	events(); 
+	intTurn++;
+}
+vector<coord> Game::checkZombies()
+{
+	vector<coord> coordDeaths;
 
-	for (int intIndexX = 0; intIndexX < zombies.size(); intIndexX++)
+	for (int intX = 0; intX < zombies.size(); intX++)
 	{
-		for (int intIndexY = 0; intIndexY < zombies.size(); intIndexY++)
+		for (int intY = 0; intY < zombies.size(); intY++)
 		{
-			if (zombies[intIndexX].getX() == zombies[intIndexY].getX() && zombies[intIndexX].getY() == zombies[intIndexY].getY())
-				cout << "COLLISION AT " << zombies[intIndexX].getX() << "x" << zombies[intIndexX].getY() << endl;
+			if (zombies[intX].checkIfAlive() && zombies[intY].checkIfAlive() && zombies[intX].getID() != zombies[intY].getID() && zombies[intX].getX() == zombies[intY].getX() && zombies[intX].getY() == zombies[intY].getY())
+			{
+				zombies[intX].kill();
+				zombies[intY].kill();
+				coordDeaths.push_back(coord(zombies[intX].getX(), zombies[intX].getY()));
+				cout << "Turn " << intTurn << ": zombies " << zombies[intX].getID() << " and " << zombies[intY].getID() << " have died due to a collision at " << zombies[intX].getX() << "x" << zombies[intX].getY() << "!" << endl;
+			}
 		}
+	}
+
+	return coordDeaths;
+}
+void Game::events()
+{
+	//purpose: checks for and post events
+
+	Utility::moveCursor(0, 38 + intEventCount); //moves cursor the event board's next blank line
+
+	//post zombie death events
+	vector<coord> coordDeaths = checkZombies();
+	for (auto death : coordDeaths)
+	{
+		Utility::moveCursor(4 + death.X, 3 + death.Y);
+		cout << " ";
+		intEventCount++;
 	}
 }

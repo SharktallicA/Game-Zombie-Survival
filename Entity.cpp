@@ -10,39 +10,43 @@ int Entity::getY()
 }
 
 
-Zombie::Zombie(int intNewX, int intNewY)
+Zombie::Zombie(int intNewID, int intNewX, int intNewY)
 {
+	intID = intNewID;
 	intX = intNewX;
 	intY = intNewY;
 	changeDirection();
 };
 void Zombie::move(const coord coordBoard, const vector<Zombie> zombies)
 {
-	if (intDecay == 0)
-		changeDirection();
-
-	while (!checkMove(coordBoard, charDirection, zombies))
-		changeDirection();
-	switch (charDirection)
+	if (boolAlive)
 	{
-	case 'W':
-	case 'w':
-		intY--;
-		break;
-	case 'A':
-	case 'a':
-		intX--;
-		break;
-	case 'S':
-	case 's':
-		intY++;
-		break;
-	case 'D':
-	case 'd':
-		intX++;
-		break;
+		if (intDecay == 0)
+			changeDirection();
+
+		while (!checkMove(coordBoard, charDirection, zombies))
+			changeDirection();
+		switch (charDirection)
+		{
+		case 'W':
+		case 'w':
+			intY--;
+			break;
+		case 'A':
+		case 'a':
+			intX--;
+			break;
+		case 'S':
+		case 's':
+			intY++;
+			break;
+		case 'D':
+		case 'd':
+			intX++;
+			break;
+		}
+		intDecay--;
 	}
-	intDecay--;
 }
 void Zombie::changeDirection()
 {
@@ -62,44 +66,10 @@ void Zombie::changeDirection()
 }
 bool Zombie::checkMove(const coord coordBoard, const char charValue, const vector<Zombie> zombies)
 {
-	bool boolChecking = true;
-
-	if ((charValue == 'W' || charValue == 'w') && intY > 1)
-	{
-		for (auto zombie : zombies)
-		{
-			if ((intY - 1) == zombie.getY())
-				return false;
-			else return true;
-		}
-	}
-	else if ((charValue == 'S' || charValue == 's') && intY < coordBoard.Y)
-	{
-		for (auto zombie : zombies)
-		{
-			if ((intY + 1) == zombie.getY())
-				return false;
-			else return true;
-		}
-	}
-	else if ((charValue == 'A' || charValue == 'a') && intX > 1)
-	{
-		for (auto zombie : zombies)
-		{
-			if ((intX - 1) == zombie.getX())
-				return false;
-			else return true;
-		}
-	}
-	else if ((charValue == 'D' || charValue == 'd') && intX < coordBoard.X)
-	{
-		for (auto zombie : zombies)
-		{
-			if ((intX + 1) == zombie.getX())
-				return false;
-			else return true;
-		}
-	}
+	if ((charValue == 'W' || charValue == 'w') && intY > 1) return true;
+	else if ((charValue == 'S' || charValue == 's') && intY < coordBoard.Y) return true;
+	else if ((charValue == 'A' || charValue == 'a') && intX > 1) return true;
+	else if ((charValue == 'D' || charValue == 'd') && intX < coordBoard.X) return true;
 	else return false;
 }
 
@@ -109,10 +79,6 @@ Human::Human(string strNewName, int intNewX, int intNewY)
 	intX = intNewX;
 	intY = intNewY;
 };
-string Human::getName()
-{
-	return strName;
-}
 void Human::move(const coord coordBoard, const vector<Zombie> zombies)
 {
 	char charInput = '0';

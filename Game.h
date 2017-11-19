@@ -17,6 +17,8 @@ private:
 	const unsigned char charZOMBIE = 'Z';
 
 	//game variables
+	int intTurn = 0;
+	int intEventCount = 0;
 	coord board;
 	string strDifficulty;
 
@@ -32,6 +34,8 @@ private:
 	void printBoard();
 
 	void update();
+	void events();
+	vector<coord> checkZombies();
 public:
 	Game() { board.X = 60; board.Y = 30; };
 	bool run();
