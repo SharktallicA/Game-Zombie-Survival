@@ -3,7 +3,7 @@
 bool Game::run()
 {
 	//purpose: handles game's operation
-	//usage: inside a while loop (e.g. while(game.run());) to allow continous play
+	//how to use: inside a while loop (e.g. while(game.run());) to allow continous play
 
 	//set up window
 	Utility::setWindowTitle("Zombie Survival");
@@ -15,10 +15,9 @@ bool Game::run()
 	createZombies();
 
 	//run game loop
-	bool boolHumanAlive = true, boolZombiesAlive = true;
 	printHeader();
 	printBoard();
-	while (boolHumanAlive && boolZombiesAlive)
+	while (player.checkIfAlive())
 		update();
 
 	//end game
