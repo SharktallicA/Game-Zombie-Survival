@@ -42,14 +42,14 @@ void Game::createZombies()
 {
 	//purpose: generates a bunch of zombies (based on difficulty) and randomises their location
 
-	int intToMake = 10;
+	int intToMake = 10; //base zombie amount for novice difficulty
 	if (strDifficulty == "pro" || strDifficulty == "p")
-		intToMake *= 2;
+		intToMake *= 2; //factor in pro difficulty modifier
 
 	for (int intIndex = 0; intIndex < intToMake; intIndex++)
 	{
 		bool boolIsUnique = false;
-		int intX, intY;
+		int intX, intY; 
 
 		while (!boolIsUnique) //iterate until X-Y are unique
 		{
@@ -78,7 +78,6 @@ void Game::createZombies()
 					boolIsUnique = false;
 			}
 		}
-
 		zombies.push_back(Zombie(intIndex, intX, intY));
 	}
 }
@@ -173,13 +172,16 @@ void Game::update()
 }
 vector<coord> Game::checkZombies()
 {
-	vector<coord> coordDeaths;
+	//purpose: checks if any zombies have died and posts their death onto the event board
+	//usage: this method MUST only be called in events() method since the cursor position has to be set beforehand (ie. cursor is at event board position)
+
+	vector<coord> coordDeaths; //contains all death locations to be used elsewhere
 
 	for (int intX = 0; intX < zombies.size(); intX++)
 	{
 		for (int intY = 0; intY < zombies.size(); intY++)
 		{
-			if (zombies[intX].checkIfAlive() && zombies[intY].checkIfAlive() && zombies[intX].getID() != zombies[intY].getID() && zombies[intX].getX() == zombies[intY].getX() && zombies[intX].getY() == zombies[intY].getY())
+			if (zombies[intX].checkIfAlive() && zombies[intY].checkIfAlive() && zombies[intX].getID() != zombies[intY].getID() && zombies[intX].getX() == zombies[intY].getX() && zombies[intX].getY() == zombies[intY].getY()) //checks for a collision
 			{
 				zombies[intX].kill();
 				zombies[intY].kill();
@@ -188,7 +190,6 @@ vector<coord> Game::checkZombies()
 			}
 		}
 	}
-
 	return coordDeaths;
 }
 void Game::events()
@@ -197,7 +198,7 @@ void Game::events()
 
 	Utility::moveCursor(0, 38 + intEventCount); //moves cursor the event board's next blank line
 
-	//post zombie death events
+	//erase zombies from the board
 	vector<coord> coordDeaths = checkZombies();
 	for (auto death : coordDeaths)
 	{

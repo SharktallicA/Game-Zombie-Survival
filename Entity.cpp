@@ -9,13 +9,12 @@ int Entity::getY()
 	return intY;
 }
 
-
 Zombie::Zombie(int intNewID, int intNewX, int intNewY)
 {
 	intID = intNewID;
 	intX = intNewX;
 	intY = intNewY;
-	changeDirection();
+	changeDirection(); //randomises the zombie's path
 };
 void Zombie::move(const coord coordBoard, const vector<Zombie> zombies)
 {
@@ -51,6 +50,7 @@ void Zombie::move(const coord coordBoard, const vector<Zombie> zombies)
 void Zombie::changeDirection()
 {
 	//purpose: changes the direction of the zombie randomly and generates a path decay
+	//pre-condition: ideally only calleed if the path has decayed to zero
 
 	intDecay = Utility::generateNumber(1, 10);
 	int intDirection = Utility::generateNumber(1, 4);
