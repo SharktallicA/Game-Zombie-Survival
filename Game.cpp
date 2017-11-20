@@ -1,21 +1,27 @@
 #include "Game.h"
 
+Game::Game()
+{
+	Utility::setColour(WHITE, BLACK);
+}
 bool Game::run()
 {
 	//purpose: handles game's operation
 	//how to use: inside a while loop (e.g. while(game.run());) to allow continous play
 
-	//set up window
-	Utility::setWindowTitle("Zombie Survival");
-	Utility::setWindowSize(800, 800);
-
 	//set up game
-	createHuman();
 	getDifficulty();
+	createHuman();
 	createZombies();
 
+	//set up window
+	Utility::setWindowTitle("Zombie Survival");
+	if (boolIsExpert)
+		Utility::setWindowSize(830, 800);
+	else
+		Utility::setWindowSize(595, 800);
+
 	//run game loop
-	printHeader();
 	printBoard();
 	while (player.checkIfAlive())
 		update();
@@ -32,19 +38,20 @@ void Game::createHuman()
 void Game::getDifficulty()
 {
 	//purpose: asks user for input on difficulty
-
-	do
-	{
-		strDifficulty = Utility::getString("Enter difficulty (novice/n or pro/p): ");
-	} while(strDifficulty != "novice" && strDifficulty != "n" && strDifficulty != "pro" && strDifficulty != "p");
+	
+	boolIsExpert = Utility::getYesNo("Use expert difficulty (y/n)? ");
+	if (boolIsExpert)
+		board = coord(90, 30);
+	else
+		board = coord(60, 30);
 }
 void Game::createZombies()
 {
 	//purpose: generates a bunch of zombies (based on difficulty) and randomises their location
 
-	int intToMake = 10; //base zombie amount for novice difficulty
-	if (strDifficulty == "pro" || strDifficulty == "p")
-		intToMake *= 2; //factor in pro difficulty modifier
+	int intToMake = 10; //base zombie amount for normal difficulty
+	if (boolIsExpert)
+		intToMake *= 3; //factor in expert difficulty modifier
 
 	for (int intIndex = 0; intIndex < intToMake; intIndex++)
 	{
@@ -65,8 +72,8 @@ void Game::createZombies()
 				{
 					if (boolIsUnique)
 					{
-					if (intX == zombie.getX() && intY == zombie.getY())
-						boolIsUnique = false;
+						if (intX == zombie.getX() && intY == zombie.getY())
+							boolIsUnique = false;
 					}
 				}
 			}
@@ -82,18 +89,17 @@ void Game::createZombies()
 	}
 }
 
-void Game::printHeader()
-{
-	//purpose: prints header of program
-
-	Utility::clearScreen();
-	cout << "Zombie Survival | Khalid Ali";
-}
 void Game::printBoard()
 {
 	//purpose: prints out board with all entity starting positions in place
+	
+	//draw move counter
+	Utility::clearScreen();
+	Utility::setColour(WHITE, BLACK);
+	cout << "Move " << intMove;
 
 	//draw board rows
+	Utility::setColour(LIGHT_BLUE, LIGHT_BLUE);
 	for (int intIndex = 0; intIndex <= board.X; intIndex++)
 	{
 		Utility::moveCursor(4 + intIndex, 3);
@@ -112,10 +118,12 @@ void Game::printBoard()
 	}
 
 	//draw human
+	Utility::setColour(YELLOW, BLACK);
 	Utility::moveCursor(4 + player.getX(), 3 + player.getY());
 	cout << charHUMAN;
 
 	//draw zombies
+	Utility::setColour(LIGHT_RED, BLACK);
 	for (auto zombie : zombies)
 	{
 		Utility::moveCursor(4 + zombie.getX(), 3 + zombie.getY());
@@ -123,6 +131,7 @@ void Game::printBoard()
 	}
 
 	//draw event board
+	Utility::setColour(WHITE, BLACK);
 	Utility::moveCursor(0, 37);
 	cout << "Events: ";
 }
@@ -139,7 +148,7 @@ void Game::update()
 
 	//update zombie positions
 	vector<coord> zombiesLast;
-	for (int intIndex = 0; intIndex < zombies.size(); intIndex++)
+	for (unsigned int intIndex = 0; intIndex < zombies.size(); intIndex++)
 	{
 		coord zombieLast;
 		zombieLast.X = zombies[intIndex].getX();
@@ -148,14 +157,21 @@ void Game::update()
 		zombies[intIndex].move(board, zombies);
 	}
 
+	//redraw move counter
+	Utility::moveCursor(0, 0);
+	Utility::setColour(WHITE, BLACK);
+	cout << "Move " << intMove;
+
 	//redraw human
+	Utility::setColour(YELLOW, BLACK);
 	Utility::moveCursor(4 + playerLast.X, 3 + playerLast.Y);
 	cout << " ";
 	Utility::moveCursor(4 + player.getX(), 3 + player.getY());
 	cout << charHUMAN;
 
 	//redraw zombies
-	for (int intIndex = 0; intIndex < zombies.size(); intIndex++)
+	Utility::setColour(LIGHT_RED, BLACK);
+	for (unsigned int intIndex = 0; intIndex < zombies.size(); intIndex++)
 	{
 		if (zombies[intIndex].checkIfAlive())
 		{
@@ -168,7 +184,7 @@ void Game::update()
 
 	//post-update procedures
 	events(); 
-	intTurn++;
+	intMove++;
 }
 vector<coord> Game::checkZombies()
 {
@@ -177,16 +193,16 @@ vector<coord> Game::checkZombies()
 
 	vector<coord> coordDeaths; //contains all death locations to be used elsewhere
 
-	for (int intX = 0; intX < zombies.size(); intX++)
+	for (unsigned int intX = 0; intX < zombies.size(); intX++)
 	{
-		for (int intY = 0; intY < zombies.size(); intY++)
+		for (unsigned int intY = 0; intY < zombies.size(); intY++)
 		{
 			if (zombies[intX].checkIfAlive() && zombies[intY].checkIfAlive() && zombies[intX].getID() != zombies[intY].getID() && zombies[intX].getX() == zombies[intY].getX() && zombies[intX].getY() == zombies[intY].getY()) //checks for a collision
 			{
 				zombies[intX].kill();
 				zombies[intY].kill();
 				coordDeaths.push_back(coord(zombies[intX].getX(), zombies[intX].getY()));
-				cout << "Turn " << intTurn << ": zombies " << zombies[intX].getID() << " and " << zombies[intY].getID() << " have died due to a collision at " << zombies[intX].getX() << "x" << zombies[intX].getY() << "!" << endl;
+				cout << "Move " << intMove << ": zombies " << zombies[intX].getID() << " and " << zombies[intY].getID() << " have died due to a collision at " << zombies[intX].getX() << "x" << zombies[intX].getY() << "!" << endl;
 			}
 		}
 	}
@@ -199,6 +215,7 @@ void Game::events()
 	Utility::moveCursor(0, 38 + intEventCount); //moves cursor the event board's next blank line
 
 	//erase zombies from the board
+	Utility::setColour(WHITE, BLACK);
 	vector<coord> coordDeaths = checkZombies();
 	for (auto death : coordDeaths)
 	{

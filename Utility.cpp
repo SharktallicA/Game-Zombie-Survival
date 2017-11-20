@@ -154,10 +154,10 @@ void Utility::setColour(COLOUR clrFore, COLOUR clrBack = BLACK)
 	//purpose: sets the console colour
 	//parametres: (clrFore) enumeration for foreground colour, (clrBack) enumeration for background colour (defaulted as black)
 
+	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	int intColour = clrBack * 16 + clrFore;
-	HWND console = GetConsoleWindow();
 
-	SetConsoleTextAttribute(console, intColour);
+	SetConsoleTextAttribute(handle, intColour);
 }
 void Utility::moveCursor(SHORT shrtX, SHORT shrtY)
 {
