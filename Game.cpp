@@ -1,9 +1,5 @@
 ﻿#include "Game.h"
 
-Game::Game()
-{
-	Utility::setColour(WHITE, BLACK);
-}
 bool Game::run()
 {
 	//purpose: handles game's operation
@@ -11,15 +7,13 @@ bool Game::run()
 
 	//set up game
 	getDifficulty();
+	createManholes();
 	createHuman();
 	createZombies();
 
 	//set up window
 	Utility::setWindowTitle("Zombie Survival");
-	if (boolIsExpert)
-		Utility::setWindowSize(830, 1000);
-	else
-		Utility::setWindowSize(595, 1000);
+	Utility::setWindowSize(1000, 1000);
 
 	//run game loop
 	printBoard();
@@ -33,26 +27,57 @@ bool Game::run()
 	return Utility::getYesNo("Play again (y/n)? ");
 }
 
-void Game::createHuman()
-{
-	//purpose: configure's the human's start properties
-	player = Human(Utility::getString("Enter your name: "), coord(Utility::generateNumber(1, board.X), Utility::generateNumber(1, board.Y)));
-}
 void Game::getDifficulty()
 {
 	//purpose: asks user for input on difficulty
-	
+
 	boolIsExpert = Utility::getYesNo("Use expert difficulty (y/n)? ");
 	if (boolIsExpert)
 		board = coord(90, 30);
 	else
 		board = coord(60, 30);
 }
+void Game::createManholes()
+{
+	//purpose: generates a bunch of manholes (based on difficulty) with random locations
+
+	int intToMake = 5; //base manhole amount for normal difficulty
+	if (boolIsExpert)
+		intToMake *= 3; //factor in expert difficulty modifier
+	
+	for (int intIndex = 0; intIndex < intToMake; intIndex++)
+	{
+		bool boolIsUnique = false;
+		int intX, intY;
+
+		while (!boolIsUnique) //iterate until X-Y are unique
+		{
+			//generate two start numbers
+			boolIsUnique = true;
+			intX = Utility::generateNumber(1, board.X);
+			intY = Utility::generateNumber(1, board.Y);
+
+			//prevent manhole from spawning on other manholes
+			if (!zombies.empty())
+			{
+				for (auto manhole : manholes)
+				{
+					if (boolIsUnique)
+					{
+						if (intX == manhole.getPos().X && intY == manhole.getPos().Y)
+							boolIsUnique = false;
+					}
+				}
+			}
+		}
+		manholes.push_back(Manhole(intIndex, coord(intX, intY)));
+	}
+}
 void Game::createZombies()
 {
 	//purpose: generates a bunch of zombies (based on difficulty) and randomises their location
 
-	int intToMake = 10; //base zombie amount for normal difficulty ***DECREASED FOR TESTING***
+	int intToMake = 10; //base zombie amount for normal difficulty
 	if (boolIsExpert)
 		intToMake *= 3; //factor in expert difficulty modifier
 
@@ -81,20 +106,60 @@ void Game::createZombies()
 				}
 			}
 
-			//prevent zombie from being spanwed on player
+			//prevent zombie from spawning on a manhole
+			for (auto manhole : manholes)
+			{
+				if (boolIsUnique)
+				{
+					if (intX == manhole.getPos().X && intY == manhole.getPos().Y)
+						boolIsUnique = false;
+				}
+			}
+		}
+		zombies.push_back(Zombie(zombies.size(), coord(intX, intY)));
+	}
+}
+void Game::createHuman()
+{
+	//purpose: configure's the human's start properties
+
+	bool boolIsUnique = false;
+	coord coordPosition(0, 0);
+
+	while (!boolIsUnique) //iterate until X-Y are unique
+	{
+		//generate two start numbers
+		boolIsUnique = true;
+		coordPosition = coord(Utility::generateNumber(1, board.X), Utility::generateNumber(1, board.Y));
+
+		//prevent human from spawning on zombies
+		for (auto zombie : zombies)
+		{
 			if (boolIsUnique)
 			{
-				if (intX == player.getPos().X && intY == player.getPos().Y)
+				if (coordPosition.X == zombie.getPos().X && coordPosition.Y == zombie.getPos().Y)
 					boolIsUnique = false;
 			}
 		}
-		zombies.push_back(Zombie(intIndex, coord(intX, intY)));
+
+		//prevent human from spawning on a manhole
+		for (auto manhole : manholes)
+		{
+			if (boolIsUnique)
+			{
+				if (coordPosition.X == manhole.getPos().X && coordPosition.Y == manhole.getPos().Y)
+					boolIsUnique = false;
+			}
+		}
 	}
+	player = Human(Utility::getString("Enter your name: "), coordPosition);
 }
 
 void Game::printBoard()
 {
 	//purpose: prints out board with all entity starting positions in place
+
+	Utility::clearScreen();
 
 	//draw board rows
 	Utility::setColour(LIGHT_BLUE, LIGHT_BLUE);
@@ -118,6 +183,9 @@ void Game::printBoard()
 	//draw human
 	drawPlayer(coord(-1, -1)); //-1 flags that the drawPlayer() method should not erase a previous path since no exits
 
+	//draw manholes
+	drawManholes();
+
 	//draw zombies
 	vector<coord> emptyVector;
 	drawZombies(emptyVector); //emptyVector passed to flag that the drawZombies() method should not erase a previous path since no exits
@@ -135,6 +203,9 @@ void Game::update()
 	//update human
 	drawPlayer(updateHuman());
 
+	//update manholes
+	drawManholes();
+
 	//update zombies
 	drawZombies(updateZombies());
 
@@ -151,16 +222,14 @@ coord Game::updateHuman()
 	player.move(board);
 	return playerLast;
 }
+
 vector<coord> Game::updateZombies()
 {
 	vector<coord> zombiesLast;
 
 	for (unsigned int intIndex = 0; intIndex < zombies.size(); intIndex++)
 	{
-		coord zombieLast;
-		zombieLast.X = zombies[intIndex].getPos().X;
-		zombieLast.Y = zombies[intIndex].getPos().Y;
-		zombiesLast.push_back(zombieLast);
+		zombiesLast.push_back(zombies[intIndex].getPos());
 		zombies[intIndex].move(board, zombies);
 	}
 	return zombiesLast;
@@ -181,6 +250,17 @@ void Game::drawPlayer(coord playerLast)
 	//draw human's new position 
 	Utility::moveCursor(4 + player.getPos().X, 3 + player.getPos().Y);
 	cout << charHUMAN;
+}
+void Game::drawManholes()
+{
+	Utility::setColour(LIGHT_PURPLE, BLACK);
+
+	for (unsigned int intIndex = 0; intIndex < manholes.size(); intIndex++)
+	{
+		//draw manhole's new position
+		Utility::moveCursor(4 + manholes[intIndex].getPos().X, 3 + manholes[intIndex].getPos().Y);
+		cout << charMANHOLE;
+	}
 }
 void Game::drawZombies(vector<coord> zombiesLast)
 {
@@ -212,7 +292,7 @@ void Game::events()
 
 	Utility::moveCursor(0, 38 + intEventCount); //moves cursor the event board's next blank line
 
-												//erase zombies from the board
+	//erase zombies from the board
 	Utility::setColour(WHITE, BLACK);
 	vector<coord> coordDeaths = checkZombies();
 	for (auto death : coordDeaths)
@@ -222,13 +302,33 @@ void Game::events()
 		intEventCount++;
 	}
 }
+void Game::checkHuman()
+{
+	//purpose: checks whether the human is in contact with zombies and manholes
+}
 vector<coord> Game::checkZombies()
 {
 	//purpose: checks if any zombies have died and posts their death onto the event board
-	//usage: this method MUST only be called in events() method since the cursor position has to be set beforehand (ie. cursor is at event board position)
+	//pre-condition: this method MUST only be called in events() method since the cursor position has to be set beforehand (ie. cursor is at event board position)
 
 	vector<coord> coordDeaths; //contains all death locations to be used elsewhere
 
+	//check for collisions with manholes
+	for (unsigned int intX = 0; intX < zombies.size(); intX++)
+	{
+		for (unsigned int intY = 0; intY < manholes.size(); intY++)
+		{
+			if (zombies[intX].checkIfAlive() && zombies[intX].getPos().X == manholes[intY].getPos().X && zombies[intX].getPos().Y == manholes[intY].getPos().Y) //checks for a collision
+			{
+				zombies[intX].kill();
+				zombies[intY].kill();
+				coordDeaths.push_back(coord(zombies[intX].getPos().X, zombies[intX].getPos().Y));
+				cout << "Move " << intMove << ": zombie " << zombies[intX].getID() << " fell through a manhole at " << zombies[intX].getPos().X << "x" << zombies[intX].getPos().Y << "!" << endl;
+			}
+		}
+	}
+
+	//check for collisions with other zombies
 	for (unsigned int intX = 0; intX < zombies.size(); intX++)
 	{
 		for (unsigned int intY = 0; intY < zombies.size(); intY++)

@@ -10,11 +10,13 @@ using namespace std;
 class Entity
 {
 protected:
+	int intID;
 	coord position;
 	char charDirection = 0;
 	bool boolAlive = true;
 public:
 	Entity() {};
+	int getID() { return intID; };
 	coord getPos() { return position; };
 	char getDirection() { return charDirection; };
 	bool checkIfAlive() { return boolAlive; };
@@ -22,17 +24,22 @@ public:
 	void kill() { boolAlive = false; }
 };
 
+class Manhole : public Entity
+{
+public:
+	Manhole() : Entity() {};
+	Manhole(int, coord);
+};
+
 class Zombie : public Entity
 {
 private:
-	int intID;
 	int intDecay = 0;
 	void changeDirection();
 	bool checkMove(const coord, const char, const vector<Zombie>);
 public:
 	Zombie() : Entity() {};
 	Zombie(int, coord);
-	int getID() { return intID; };
 	void move(const coord, const vector<Zombie>);
 };
 

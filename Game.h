@@ -14,6 +14,7 @@ private:
 	//constants
 	const unsigned char charBORDER = 178;
 	const unsigned char charHUMAN = 'H';
+	const unsigned char charMANHOLE = 'M';
 	const unsigned char charZOMBIE = 'Z';
 
 	//game variables
@@ -24,11 +25,13 @@ private:
 
 	//game objects
 	Human player;
+	vector<Manhole> manholes;
 	vector<Zombie> zombies;
 
-	void createHuman();
 	void getDifficulty();
+	void createManholes();
 	void createZombies();
+	void createHuman();
 
 	void printBoard();
 
@@ -36,11 +39,13 @@ private:
 	coord updateHuman();
 	vector<coord> updateZombies();
 	void drawPlayer(coord);
+	void drawManholes();
 	void drawZombies(vector<coord>);
 
 	void events();
+	void checkHuman();
 	vector<coord> checkZombies();
 public:
-	Game();
+	Game() { Utility::setColour(WHITE, BLACK); };
 	bool run();
 };

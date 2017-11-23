@@ -1,5 +1,11 @@
 #include "Entity.h"
 
+Manhole::Manhole(int intNewID, coord coordNewPosition)
+{
+	intID = intNewID;
+	position = coordNewPosition;
+};
+
 Zombie::Zombie(int intNewID, coord coordNewPosition)
 {
 	intID = intNewID;
