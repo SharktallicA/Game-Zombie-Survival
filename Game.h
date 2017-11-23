@@ -25,7 +25,6 @@ private:
 	//game objects
 	Human player;
 	vector<Zombie> zombies;
-	vector<Bullet> bullets;
 
 	void createHuman();
 	void getDifficulty();
@@ -37,7 +36,6 @@ private:
 	coord updateHuman();
 	vector<coord> updateZombies();
 	void drawPlayer(coord);
-	void drawGun();
 	void drawZombies(vector<coord>);
 
 	void events();

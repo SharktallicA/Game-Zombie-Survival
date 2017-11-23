@@ -52,7 +52,7 @@ void Game::createZombies()
 {
 	//purpose: generates a bunch of zombies (based on difficulty) and randomises their location
 
-	int intToMake = 1; //base zombie amount for normal difficulty ***DECREASED FOR TESTING***
+	int intToMake = 10; //base zombie amount for normal difficulty ***DECREASED FOR TESTING***
 	if (boolIsExpert)
 		intToMake *= 3; //factor in expert difficulty modifier
 
@@ -75,7 +75,7 @@ void Game::createZombies()
 				{
 					if (boolIsUnique)
 					{
-						if (intX == zombie.getX() && intY == zombie.getY())
+						if (intX == zombie.getPos().X && intY == zombie.getPos().Y)
 							boolIsUnique = false;
 					}
 				}
@@ -84,7 +84,7 @@ void Game::createZombies()
 			//prevent zombie from being spanwed on player
 			if (boolIsUnique)
 			{
-				if (intX == player.getX() && intY == player.getY())
+				if (intX == player.getPos().X && intY == player.getPos().Y)
 					boolIsUnique = false;
 			}
 		}
@@ -116,17 +116,11 @@ void Game::printBoard()
 	}
 
 	//draw human
-	Utility::setColour(YELLOW, BLACK);
-	Utility::moveCursor(4 + player.getX(), 3 + player.getY());
-	cout << charHUMAN;
+	drawPlayer(coord(-1, -1)); //-1 flags that the drawPlayer() method should not erase a previous path since no exits
 
 	//draw zombies
-	Utility::setColour(LIGHT_RED, BLACK);
-	for (auto zombie : zombies)
-	{
-		Utility::moveCursor(4 + zombie.getX(), 3 + zombie.getY());
-		cout << charZOMBIE;
-	}
+	vector<coord> emptyVector;
+	drawZombies(emptyVector); //emptyVector passed to flag that the drawZombies() method should not erase a previous path since no exits
 
 	//draw event board
 	Utility::setColour(WHITE, BLACK);
@@ -140,7 +134,6 @@ void Game::update()
 
 	//update human
 	drawPlayer(updateHuman());
-	drawGun();
 
 	//update zombies
 	drawZombies(updateZombies());
@@ -152,20 +145,21 @@ void Game::update()
 coord Game::updateHuman()
 {
 	coord playerLast;
-	playerLast.X = player.getX();
-	playerLast.Y = player.getY();
-	player.move(board, bullets);
 
+	playerLast.X = player.getPos().X;
+	playerLast.Y = player.getPos().Y;
+	player.move(board);
 	return playerLast;
 }
 vector<coord> Game::updateZombies()
 {
 	vector<coord> zombiesLast;
+
 	for (unsigned int intIndex = 0; intIndex < zombies.size(); intIndex++)
 	{
 		coord zombieLast;
-		zombieLast.X = zombies[intIndex].getX();
-		zombieLast.Y = zombies[intIndex].getY();
+		zombieLast.X = zombies[intIndex].getPos().X;
+		zombieLast.Y = zombies[intIndex].getPos().Y;
 		zombiesLast.push_back(zombieLast);
 		zombies[intIndex].move(board, zombies);
 	}
@@ -173,46 +167,40 @@ vector<coord> Game::updateZombies()
 }
 void Game::drawPlayer(coord playerLast)
 {
+	//pre-condition: a previous player position is provided for path erasing, or a 'dummy' coord with -1 to flag for no path erasing
+
 	Utility::setColour(LIGHT_YELLOW, BLACK);
-	Utility::moveCursor(4 + playerLast.X, 3 + playerLast.Y);
-	cout << " ";
-	Utility::moveCursor(4 + player.getX(), 3 + player.getY());
+
+	//erase human char
+	if (playerLast.X != -1 && playerLast.Y != -1)
+	{
+		Utility::moveCursor(4 + playerLast.X, 3 + playerLast.Y);
+		cout << " ";
+	}
+
+	//draw human's new position 
+	Utility::moveCursor(4 + player.getPos().X, 3 + player.getPos().Y);
 	cout << charHUMAN;
-}
-void Game::drawGun()
-{
-	Utility::setColour(YELLOW, BLACK);
-	if (player.getDirection() == 'W' && player.getY() > 1)
-	{
-		Utility::moveCursor(4 + player.getX(), 3 + player.getY() - 1);
-		cout << "|";
-	}
-	else if (player.getDirection() == 'S' && player.getY() < (board.Y))
-	{
-		Utility::moveCursor(4 + player.getX(), 3 + player.getY() + 1);
-		cout << "|";
-	}
-	else if (player.getDirection() == 'A' && player.getX() > 1)
-	{
-		Utility::moveCursor(4 + player.getX() - 1, 3 + player.getY());
-		cout << "-";
-	}
-	else if (player.getDirection() == 'D' && player.getX() < (board.X))
-	{
-		Utility::moveCursor(4 + player.getX() + 1, 3 + player.getY());
-		cout << "-";
-	}
 }
 void Game::drawZombies(vector<coord> zombiesLast)
 {
+	//pre-condition: previous zombie positions are provided for path erasing, or a 'dummy' vector with no coords to flag for no path erasing
+
 	Utility::setColour(LIGHT_RED, BLACK);
+
 	for (unsigned int intIndex = 0; intIndex < zombies.size(); intIndex++)
 	{
 		if (zombies[intIndex].checkIfAlive())
 		{
-			Utility::moveCursor(4 + zombiesLast[intIndex].X, 3 + zombiesLast[intIndex].Y);
-			cout << " ";
-			Utility::moveCursor(4 + zombies[intIndex].getX(), 3 + zombies[intIndex].getY());
+			//erase zombie's old position
+			if (zombiesLast.size() != 0)
+			{
+				Utility::moveCursor(4 + zombiesLast[intIndex].X, 3 + zombiesLast[intIndex].Y);
+				cout << " ";
+			}
+
+			//draw zombie's new position
+			Utility::moveCursor(4 + zombies[intIndex].getPos().X, 3 + zombies[intIndex].getPos().Y);
 			cout << charZOMBIE;
 		}
 	}
@@ -245,12 +233,12 @@ vector<coord> Game::checkZombies()
 	{
 		for (unsigned int intY = 0; intY < zombies.size(); intY++)
 		{
-			if (zombies[intX].checkIfAlive() && zombies[intY].checkIfAlive() && zombies[intX].getID() != zombies[intY].getID() && zombies[intX].getX() == zombies[intY].getX() && zombies[intX].getY() == zombies[intY].getY()) //checks for a collision
+			if (zombies[intX].checkIfAlive() && zombies[intY].checkIfAlive() && zombies[intX].getID() != zombies[intY].getID() && zombies[intX].getPos().X == zombies[intY].getPos().X && zombies[intX].getPos().Y == zombies[intY].getPos().Y) //checks for a collision
 			{
 				zombies[intX].kill();
 				zombies[intY].kill();
-				coordDeaths.push_back(coord(zombies[intX].getX(), zombies[intX].getY()));
-				cout << "Move " << intMove << ": zombies " << zombies[intX].getID() << " and " << zombies[intY].getID() << " have died due to a collision at " << zombies[intX].getX() << "x" << zombies[intX].getY() << "!" << endl;
+				coordDeaths.push_back(coord(zombies[intX].getPos().X, zombies[intX].getPos().Y));
+				cout << "Move " << intMove << ": zombies " << zombies[intX].getID() << " and " << zombies[intY].getID() << " have died due to a collision at " << zombies[intX].getPos().X << "x" << zombies[intX].getPos().Y << "!" << endl;
 			}
 		}
 	}

@@ -10,14 +10,12 @@ using namespace std;
 class Entity
 {
 protected:
-	int intX;
-	int intY;
+	coord position;
 	char charDirection = 0;
 	bool boolAlive = true;
 public:
 	Entity() {};
-	int getX();
-	int getY();
+	coord getPos() { return position; };
 	char getDirection() { return charDirection; };
 	bool checkIfAlive() { return boolAlive; };
 	virtual void move() {};
@@ -38,22 +36,14 @@ public:
 	void move(const coord, const vector<Zombie>);
 };
 
-class Bullet : public Entity
-{
-public:
-	Bullet() : Entity() {};
-	Bullet(char, coord);
-};
-
 class Human : public Entity
 {
 private:
 	string strName;
 	void checkMove(const coord, const char);
-	Bullet fire();
 public:
 	Human() : Entity() {};
 	Human(string, coord);
 	string getName() { return strName; };
-	void move(const coord, vector<Bullet>);
+	void move(const coord);
 };
