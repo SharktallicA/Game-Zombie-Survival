@@ -12,4 +12,10 @@ struct coord
 		X = coordOther.X;
 		Y = coordOther.Y;
 	}
+
+	bool operator==(const coord coordOther)
+	{
+		if (coordOther.X == X && coordOther.Y == Y) return true;
+		else return false;
+	}
 };

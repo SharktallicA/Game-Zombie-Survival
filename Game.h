@@ -43,7 +43,7 @@ private:
 	void drawZombies(vector<coord>);
 
 	void events();
-	void checkHuman();
+	bool checkHuman();
 	vector<coord> checkZombies();
 public:
 	Game() { Utility::setColour(WHITE, BLACK); };

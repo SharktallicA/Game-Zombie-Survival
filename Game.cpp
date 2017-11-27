@@ -24,6 +24,8 @@ bool Game::run()
 	}
 
 	//end game
+	Utility::clearScreen();
+	Utility::setColour(WHITE, BLACK);
 	return Utility::getYesNo("Play again (y/n)? ");
 }
 
@@ -77,7 +79,7 @@ void Game::createZombies()
 {
 	//purpose: generates a bunch of zombies (based on difficulty) and randomises their location
 
-	int intToMake = 10; //base zombie amount for normal difficulty
+	int intToMake = 5; //base zombie amount for normal difficulty
 	if (boolIsExpert)
 		intToMake *= 3; //factor in expert difficulty modifier
 
@@ -203,15 +205,18 @@ void Game::update()
 	//update human
 	drawPlayer(updateHuman());
 
-	//update manholes
-	drawManholes();
+	if (checkHuman()) //update only continues if human is alive
+	{
+		//update manholes
+		drawManholes();
 
-	//update zombies
-	drawZombies(updateZombies());
+		//update zombies
+		drawZombies(updateZombies());
 
-	//post-update procedures
-	events(); 
-	intMove++;
+		//post-update procedures
+		events();
+		intMove++;
+	}
 }
 coord Game::updateHuman()
 {
@@ -302,9 +307,20 @@ void Game::events()
 		intEventCount++;
 	}
 }
-void Game::checkHuman()
+bool Game::checkHuman()
 {
-	//purpose: checks whether the human is in contact with zombies and manholes
+	//purpose: checks whether the human is in contact with zombies
+	//pre-condition: this method is called in update() after the human has made a move
+
+	for (auto zombie : zombies)
+	{
+		if (player.checkIfAlive())
+		{
+			if (player.getPos() == zombie.getPos())
+				player.kill();
+		}
+	}
+	return player.checkIfAlive();
 }
 vector<coord> Game::checkZombies()
 {
@@ -318,10 +334,9 @@ vector<coord> Game::checkZombies()
 	{
 		for (unsigned int intY = 0; intY < manholes.size(); intY++)
 		{
-			if (zombies[intX].checkIfAlive() && zombies[intX].getPos().X == manholes[intY].getPos().X && zombies[intX].getPos().Y == manholes[intY].getPos().Y) //checks for a collision
+			if (zombies[intX].checkIfAlive() && zombies[intX].getPos() == manholes[intY].getPos()) //checks for a collision
 			{
 				zombies[intX].kill();
-				zombies[intY].kill();
 				coordDeaths.push_back(coord(zombies[intX].getPos().X, zombies[intX].getPos().Y));
 				cout << "Move " << intMove << ": zombie " << zombies[intX].getID() << " fell through a manhole at " << zombies[intX].getPos().X << "x" << zombies[intX].getPos().Y << "!" << endl;
 			}
@@ -333,7 +348,7 @@ vector<coord> Game::checkZombies()
 	{
 		for (unsigned int intY = 0; intY < zombies.size(); intY++)
 		{
-			if (zombies[intX].checkIfAlive() && zombies[intY].checkIfAlive() && zombies[intX].getID() != zombies[intY].getID() && zombies[intX].getPos().X == zombies[intY].getPos().X && zombies[intX].getPos().Y == zombies[intY].getPos().Y) //checks for a collision
+			if (zombies[intX].checkIfAlive() && zombies[intY].checkIfAlive() && zombies[intX].getID() != zombies[intY].getID() && zombies[intX].getPos() == zombies[intY].getPos()) //checks for a collision
 			{
 				zombies[intX].kill();
 				zombies[intY].kill();
