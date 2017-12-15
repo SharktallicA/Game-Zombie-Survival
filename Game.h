@@ -16,10 +16,9 @@ private:
 	const unsigned char charHUMAN = 'H';
 	const unsigned char charMANHOLE = 'M';
 	const unsigned char charZOMBIE = 'Z';
+	const unsigned int intSleep = 60;
 
 	//game variables
-	int intMove = 1;
-	int intEventCount = 0;
 	bool boolIsExpert;
 	coord board;
 
@@ -42,7 +41,7 @@ private:
 	void drawManholes();
 	void drawZombies(vector<coord>);
 
-	void events();
+	void postUpdate();
 	bool checkHuman();
 	vector<coord> checkZombies();
 public:

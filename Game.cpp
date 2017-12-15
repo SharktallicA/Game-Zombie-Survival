@@ -13,18 +13,20 @@ bool Game::run()
 
 	//set up window
 	Utility::setWindowTitle("Zombie Survival");
-	Utility::setWindowSize(1000, 1000);
+	Utility::setWindowSize(1024, 564);
 
 	//run game loop
 	printBoard();
 	while (player.checkIfAlive())
 	{
 		update();
-		Sleep(50);
+		Sleep(intSleep);
 	}
 
 	//end game
 	Utility::clearScreen();
+	cin.ignore();
+	Sleep(100);
 	Utility::setColour(WHITE, BLACK);
 	return Utility::getYesNo("Play again (y/n)? ");
 }
@@ -34,10 +36,7 @@ void Game::getDifficulty()
 	//purpose: asks user for input on difficulty
 
 	boolIsExpert = Utility::getYesNo("Use expert difficulty (y/n)? ");
-	if (boolIsExpert)
-		board = coord(90, 30);
-	else
-		board = coord(60, 30);
+	board = coord(60, 30);
 }
 void Game::createManholes()
 {
@@ -81,7 +80,7 @@ void Game::createZombies()
 
 	int intToMake = 5; //base zombie amount for normal difficulty
 	if (boolIsExpert)
-		intToMake *= 3; //factor in expert difficulty modifier
+		intToMake *= 2; //factor in expert difficulty modifier
 
 	for (int intIndex = 0; intIndex < intToMake; intIndex++)
 	{
@@ -192,10 +191,11 @@ void Game::printBoard()
 	vector<coord> emptyVector;
 	drawZombies(emptyVector); //emptyVector passed to flag that the drawZombies() method should not erase a previous path since no exits
 
-	//draw event board
+	//draw stats board
 	Utility::setColour(WHITE, BLACK);
 	Utility::moveCursor(0, 37);
-	cout << "Events: ";
+	cout << "Zombies alive: " << zombies.size() << "/" << zombies.size() << endl;
+	cout << "Manholes: " << manholes.size();
 }
 
 void Game::update()
@@ -214,8 +214,7 @@ void Game::update()
 		drawZombies(updateZombies());
 
 		//post-update procedures
-		events();
-		intMove++;
+		postUpdate();
 	}
 }
 coord Game::updateHuman()
@@ -235,7 +234,7 @@ vector<coord> Game::updateZombies()
 	for (unsigned int intIndex = 0; intIndex < zombies.size(); intIndex++)
 	{
 		zombiesLast.push_back(zombies[intIndex].getPos());
-		zombies[intIndex].move(board, zombies);
+		zombies[intIndex].move(board, player);
 	}
 	return zombiesLast;
 }
@@ -291,21 +290,28 @@ void Game::drawZombies(vector<coord> zombiesLast)
 	}
 }
 
-void Game::events()
+void Game::postUpdate()
 {
-	//purpose: checks for and post events
+	//purpose: does the post-update tidying and stat display
 
-	Utility::moveCursor(0, 38 + intEventCount); //moves cursor the event board's next blank line
-
-	//erase zombies from the board
-	Utility::setColour(WHITE, BLACK);
+	//erase dead zombies from the board
 	vector<coord> coordDeaths = checkZombies();
 	for (auto death : coordDeaths)
 	{
 		Utility::moveCursor(4 + death.X, 3 + death.Y);
 		cout << " ";
-		intEventCount++;
 	}
+
+	//update zombie stat
+	int intZombiesAlive = 0;
+	for (auto zombie : zombies)
+	{
+		if (zombie.checkIfAlive())
+			intZombiesAlive++;
+	}
+	Utility::moveCursor(0, 37); //moves cursor the 
+	Utility::setColour(WHITE, BLACK);
+	cout << "Zombies alive: " << intZombiesAlive << "/" << zombies.size();
 }
 bool Game::checkHuman()
 {
@@ -324,10 +330,10 @@ bool Game::checkHuman()
 }
 vector<coord> Game::checkZombies()
 {
-	//purpose: checks if any zombies have died and posts their death onto the event board
-	//pre-condition: this method MUST only be called in events() method since the cursor position has to be set beforehand (ie. cursor is at event board position)
+	//purpose: checks if any zombies have died
+	//pre-condition: this method MUST only be called in stats() method
 
-	vector<coord> coordDeaths; //contains all death locations to be used elsewhere
+	vector<coord> coordDeaths;
 
 	//check for collisions with manholes
 	for (unsigned int intX = 0; intX < zombies.size(); intX++)
@@ -338,7 +344,6 @@ vector<coord> Game::checkZombies()
 			{
 				zombies[intX].kill();
 				coordDeaths.push_back(coord(zombies[intX].getPos().X, zombies[intX].getPos().Y));
-				cout << "Move " << intMove << ": zombie " << zombies[intX].getID() << " fell through a manhole at " << zombies[intX].getPos().X << "x" << zombies[intX].getPos().Y << "!" << endl;
 			}
 		}
 	}
@@ -348,12 +353,11 @@ vector<coord> Game::checkZombies()
 	{
 		for (unsigned int intY = 0; intY < zombies.size(); intY++)
 		{
-			if (zombies[intX].checkIfAlive() && zombies[intY].checkIfAlive() && zombies[intX].getID() != zombies[intY].getID() && zombies[intX].getPos() == zombies[intY].getPos()) //checks for a collision
+			if (zombies[intX].checkIfAlive() && zombies[intY].checkIfAlive() && zombies[intX].getID() != zombies[intY].getID() && zombies[intX].getPos() == zombies[intY].getPos()) //checks for a collision with another UNIQUE zombie
 			{
 				zombies[intX].kill();
 				zombies[intY].kill();
 				coordDeaths.push_back(coord(zombies[intX].getPos().X, zombies[intX].getPos().Y));
-				cout << "Move " << intMove << ": zombies " << zombies[intX].getID() << " and " << zombies[intY].getID() << " have died due to a collision at " << zombies[intX].getPos().X << "x" << zombies[intX].getPos().Y << "!" << endl;
 			}
 		}
 	}

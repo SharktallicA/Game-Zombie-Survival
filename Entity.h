@@ -24,6 +24,18 @@ public:
 	void kill() { boolAlive = false; }
 };
 
+class Human : public Entity
+{
+private:
+	string strName;
+	void checkMove(const coord, const char);
+public:
+	Human() : Entity() {};
+	Human(string, coord);
+	string getName() { return strName; };
+	void move(const coord);
+};
+
 class Manhole : public Entity
 {
 public:
@@ -36,21 +48,10 @@ class Zombie : public Entity
 private:
 	int intDecay = 0;
 	void changeDirection();
-	bool checkMove(const coord, const char, const vector<Zombie>);
+	bool checkMove(const coord, const char);
+	bool homeIn(Human);
 public:
 	Zombie() : Entity() {};
 	Zombie(int, coord);
-	void move(const coord, const vector<Zombie>);
-};
-
-class Human : public Entity
-{
-private:
-	string strName;
-	void checkMove(const coord, const char);
-public:
-	Human() : Entity() {};
-	Human(string, coord);
-	string getName() { return strName; };
-	void move(const coord);
+	void move(const coord, Human);
 };
