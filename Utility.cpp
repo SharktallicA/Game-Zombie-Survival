@@ -102,7 +102,7 @@ int Utility::getInteger(string strMessage, int intMin, int intMax)
 int Utility::generateNumber(int intMin, int intMax)
 {
 	//purpose: generates a number using Mersenne Twister 19937 method with provided minimum and maximum values for range
-	//parameters: (boolRound) declares if value should be rounded, (fltMinimum) minimum bound for range, (fltMaximum) maximum bound for range
+	//parameters: (intMin) minimum bound for range, (intMax) maximum bound for range
 
 	int intResult;
 	random_device randGenerator;
@@ -134,7 +134,7 @@ void Utility::setWindowSize(unsigned int uintWidth, unsigned int uintHeight)
 	GetWindowRect(console, &rectWindow);
 	MoveWindow(console, rectWindow.left, rectWindow.top, uintWidth, uintHeight, TRUE);
 }
-void Utility::setColour(COLOUR clrFore, COLOUR clrBack = BLACK)
+void Utility::setColour(Colour clrFore, Colour clrBack = BLACK)
 {
 	//purpose: sets the console colour
 	//parametres: (clrFore) enumeration for foreground colour, (clrBack) enumeration for background colour (defaulted as black)

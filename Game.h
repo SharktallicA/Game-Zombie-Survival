@@ -16,7 +16,7 @@ private:
 	const unsigned char charHUMAN = 'H';
 	const unsigned char charMANHOLE = 'M';
 	const unsigned char charZOMBIE = 'Z';
-	const unsigned int intSleep = 60;
+	const unsigned int intSLEEP = 60;
 
 	//game variables
 	bool boolIsExpert;

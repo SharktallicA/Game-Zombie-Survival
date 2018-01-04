@@ -13,14 +13,14 @@ bool Game::run()
 
 	//set up window
 	Utility::setWindowTitle("Zombie Survival");
-	Utility::setWindowSize(1024, 564);
+	Utility::setWindowSize(1024, 720);
 
 	//run game loop
 	printBoard();
 	while (player.checkIfAlive())
 	{
 		update();
-		Sleep(intSleep);
+		Sleep(intSLEEP);
 	}
 
 	//end game

@@ -8,7 +8,7 @@
 
 using namespace std;
 
-enum COLOUR
+enum Colour
 {
 	BLACK, BLUE, GREEN, AQUA, RED, PURPLE, YELLOW, DEFAULT, GRAY, LIGHT_BLUE,
 	LIGHT_GREEN, LIGHT_AQUA, LIGHT_RED, LIGHT_PURPLE, LIGHT_YELLOW, WHITE
@@ -34,6 +34,6 @@ public:
 	static void clearScreen();
 	static void setWindowTitle(string);
 	static void setWindowSize(unsigned int, unsigned int);
-	static void setColour(COLOUR, COLOUR);
+	static void setColour(Colour, Colour);
 	static void moveCursor(SHORT, SHORT);
 };

@@ -15,13 +15,13 @@ protected:
 	char charDirection = 0;
 	bool boolAlive = true;
 public:
-	Entity() {};
-	int getID() { return intID; };
-	coord getPos() { return position; };
-	char getDirection() { return charDirection; };
-	bool checkIfAlive() { return boolAlive; };
-	virtual void move() {};
-	void kill() { boolAlive = false; }
+	Entity(void) {};
+	int getID(void) { return intID; };
+	coord getPos(void) { return position; };
+	char getDirection(void) { return charDirection; };
+	bool checkIfAlive(void) { return boolAlive; };
+	virtual void move(void) {};
+	void kill(void) { boolAlive = false; }
 };
 
 class Human : public Entity
@@ -32,7 +32,7 @@ private:
 public:
 	Human() : Entity() {};
 	Human(string, coord);
-	string getName() { return strName; };
+	string getName(void) { return strName; };
 	void move(const coord);
 };
 
@@ -47,9 +47,11 @@ class Zombie : public Entity
 {
 private:
 	int intDecay = 0;
-	void changeDirection();
+	int intSight = 0;
+	void changeDirection(void);
 	bool checkMove(const coord, const char);
-	bool homeIn(Human);
+	void moveStatic(const coord);
+	void moveHoming(Human);
 public:
 	Zombie() : Entity() {};
 	Zombie(int, coord);
