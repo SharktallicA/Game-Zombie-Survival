@@ -40,13 +40,13 @@ Manhole::Manhole(int intNewID, coord coordNewPosition)
 	position = coordNewPosition;
 };
 
-Zombie::Zombie(int intNewID, coord coordNewPosition)
+Zombie::Zombie(int intNewID, int intNewSight, coord coordNewPosition)
 {
 	//purpose: Zombie class constructor
-	//parametres: (intNewID) assigned ID, (coordNewPosition) assigned starting position
+	//parametres: (intNewID) assigned ID, (intNewSight) assigned sight range, (coordNewPosition) assigned starting position
 
 	intID = intNewID;
-	intSight = 1;
+	intSight = intNewSight;
 	position = coordNewPosition;
 	changeDirection(); //randomises the zombie's first path
 };

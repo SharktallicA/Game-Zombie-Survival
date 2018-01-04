@@ -25,8 +25,6 @@ bool Game::run()
 
 	//end game
 	Utility::clearScreen();
-	cin.ignore();
-	Sleep(100);
 	Utility::setColour(WHITE, BLACK);
 	return Utility::getYesNo("Play again (y/n)? ");
 }
@@ -79,8 +77,13 @@ void Game::createZombies()
 	//purpose: generates a bunch of zombies (based on difficulty) and randomises their location
 
 	int intToMake = 5; //base zombie amount for normal difficulty
+	int intSightRange = 1; //base zombie sight range for homing into human with
 	if (boolIsExpert)
-		intToMake *= 2; //factor in expert difficulty modifier
+	{
+		//factor in expert difficulty modifier
+		intToMake *= 2; 
+		intSightRange *= 2;
+	}
 
 	for (int intIndex = 0; intIndex < intToMake; intIndex++)
 	{
@@ -117,7 +120,7 @@ void Game::createZombies()
 				}
 			}
 		}
-		zombies.push_back(Zombie(zombies.size(), coord(intX, intY)));
+		zombies.push_back(Zombie(zombies.size(), intSightRange, coord(intX, intY)));
 	}
 }
 void Game::createHuman()
@@ -194,7 +197,7 @@ void Game::printBoard()
 	//draw stats board
 	Utility::setColour(WHITE, BLACK);
 	Utility::moveCursor(0, 37);
-	cout << "Zombies alive: " << zombies.size() << "/" << zombies.size() << endl;
+	cout << "Zombies alive: " << zombies.size() << endl;
 	cout << "Manholes: " << manholes.size();
 }
 
@@ -323,7 +326,10 @@ bool Game::checkHuman()
 		if (player.checkIfAlive())
 		{
 			if (player.getPos() == zombie.getPos())
+			{
 				player.kill();
+				break;
+			}
 		}
 	}
 	return player.checkIfAlive();

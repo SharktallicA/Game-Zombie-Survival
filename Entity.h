@@ -54,6 +54,6 @@ private:
 	void moveHoming(Human);
 public:
 	Zombie() : Entity() {};
-	Zombie(int, coord);
+	Zombie(int, int, coord);
 	void move(const coord, Human);
 };
